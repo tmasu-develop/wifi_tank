@@ -1,0 +1,254 @@
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<style type="text/css">
+* {
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;        
+}
+html,body {
+	margin:0;
+	padding:0;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+}
+#l_up_area {
+	margin:10px 10px 10px 10px;
+	background:blue;
+	color:#fff;
+	line-height:200px;
+	display: table-cell;
+	padding: 9px;
+	border: 5px solid #fff;
+	box-sizing: border-box;
+	width:50%;
+}
+#r_up_area {
+	margin:10px 10px 10px 10px;
+	background:blue;
+	color:#fff;
+	line-height:200px;
+	display: table-cell;
+	padding: 9px;
+	border: 5px solid #fff;
+	box-sizing: border-box;
+	width:50%;
+}
+#l_down_area {
+	margin:10px 10px 10px 10px;
+	background:blue;
+	color:#fff;
+	line-height:200px;
+	display: table-cell;
+	padding: 9px;
+	border: 5px solid #fff;
+	box-sizing: border-box;
+	width:50%;
+}
+#r_down_area {
+	margin:10px 10px 10px 10px;
+	background:blue;
+	color:#fff;
+	line-height:200px;
+	display: table-cell;
+	padding: 9px;
+	border: 5px solid #fff;
+	box-sizing: border-box;
+	width:50%;
+}
+.container{
+  margin: 0 auto;
+}
+.block{
+  width: 100%;
+  display: table;
+  margin-left:auto;
+  margin-right:auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+操作パネル
+<div class="block">
+<div id="l_up_area">L UP</div>
+<div id="r_up_area">R UP</div>
+</div>
+
+<div class="block">
+<div id="l_down_area">L DOWN</div>
+<div id="r_down_area">R DOWN</div>
+</div>
+<div id="coords">STATUS:<span id="st"></span></div>
+</div>
+
+<script>
+
+var l_up_status   = 0;
+var r_up_status   = 0;
+var l_down_status = 0;
+var r_down_status = 0;
+
+var connection = new WebSocket('ws://'+location.hostname+':81/', ['arduino']);
+	connection.onopen = function () {
+	connection.send('Connect ' + new Date());
+};
+
+connection.onerror = function (error) {
+	console.log('WebSocket Error ', error);
+};
+
+connection.onmessage = function (e) {
+	console.log('Server: ', e.data);
+};
+
+function sendStatus() {
+	var status = '#'+
+	l_up_status.toString() +
+	r_up_status.toString() +
+	l_down_status.toString() +
+	r_down_status.toString();
+
+	var el_st = document.getElementById('st');
+	el_st.innerHTML = status;
+
+	console.log('STATUS: ' + status);
+	connection.send(status);
+};
+
+
+var L_UP = function(){
+
+var hit_area = document.getElementById('l_up_area');
+
+// イベント設定
+
+hit_area.addEventListener('touchstart', function(event) {
+  hit_area.style.backgroundColor = 'red';
+  l_up_status = 1;
+  if(l_down_status == 1){
+    l_down_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchmove', function(event) {
+  event.preventDefault(); // タッチによる画面スクロールを止める
+  l_up_status = 1;
+  if(l_down_status == 1){
+    l_down_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchend', function(event) {
+  hit_area.style.backgroundColor = 'blue';
+  l_up_status = 0;
+  sendStatus();
+}, false);
+};
+
+var R_UP = function(){
+
+var hit_area = document.getElementById('r_up_area');
+
+// イベント設定
+
+hit_area.addEventListener('touchstart', function(event) {
+  hit_area.style.backgroundColor = 'red';
+  r_up_status = 1;
+  if(r_down_status == 1){
+    r_down_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchmove', function(event) {
+  event.preventDefault(); // タッチによる画面スクロールを止める
+  r_up_status = 1;
+  if(r_down_status == 1){
+    r_down_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchend', function(event) {
+  hit_area.style.backgroundColor = 'blue';
+  r_up_status = 0;
+  sendStatus();
+}, false);
+};
+
+var L_DOWN = function(){
+
+var hit_area = document.getElementById('l_down_area');
+
+// イベント設定
+
+hit_area.addEventListener('touchstart', function(event) {
+  hit_area.style.backgroundColor = 'red';
+  l_down_status = 1;
+  if(l_up_status == 1){
+    l_up_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchmove', function(event) {
+  event.preventDefault(); // タッチによる画面スクロールを止める
+  l_down_status = 1;
+  if(l_up_status == 1){
+    l_up_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchend', function(event) {
+  hit_area.style.backgroundColor = 'blue';
+  l_down_status = 0;
+  sendStatus();
+}, false);
+};
+
+var R_DOWN = function(){
+
+var hit_area = document.getElementById('r_down_area');
+
+// イベント設定
+
+hit_area.addEventListener('touchstart', function(event) {
+  hit_area.style.backgroundColor = 'red';
+  r_down_status = 1;
+  if(r_up_status == 1){
+    r_up_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchmove', function(event) {
+  event.preventDefault(); // タッチによる画面スクロールを止める
+  r_down_status = 1;
+  if(r_up_status == 1){
+    r_up_status = 0;
+  }
+  sendStatus();
+}, false);
+
+hit_area.addEventListener('touchend', function(event) {
+  hit_area.style.backgroundColor = 'blue';
+  r_down_status = 0;
+  sendStatus();
+}, false);
+};
+
+L_UP();
+R_UP();
+L_DOWN();
+R_DOWN();
+
+</script>
+</body>
+</html>
